@@ -1,0 +1,24 @@
+dataset:
+  name: aircraft
+  root: data
+  image_size: 224
+  batch_size: 32
+  num_workers: 4
+  train_limit: null
+  val_limit: null
+  test_limit: null
+teacher:
+  name: convnext_tiny
+student:
+  name: mobilenet_v3_large
+training:
+  epochs: 10
+  lr: 0.001
+  weight_decay: 0.0001
+  alpha: 1.0
+  beta: 1.0
+  amp: true
+  seed: 42
+outputs:
+  checkpoint_dir: checkpoints
+  results_dir: results

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks-MO434/
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
+
+# Data and generated artifacts
+data/*
+!data/README.md
+checkpoints/
+outputs/
+runs/
+wandb/
+logs/
+
+# Model files
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Environment files
+.env

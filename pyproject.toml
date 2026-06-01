@@ -1,0 +1,33 @@
+[project]
+name = "deeplearning-falcao"
+version = "0.1.0"
+description = "Knowledge distillation experiments for MO434"
+authors = [
+    {name = "zeneto",email = "josealmeidaneto2002@gmail.com"}
+]
+readme = "README_src.md"
+requires-python = ">=3.12"
+dependencies = [
+    "torch>=2.3",
+    "torchvision>=0.18",
+    "numpy>=1.26",
+    "pyyaml>=6.0",
+    "tqdm>=4.66",
+    "pandas>=2.2",
+    "thop>=0.1.1.post2209072238",
+]
+
+[project.scripts]
+kd-train-teacher = "src.training.train_teacher_classifier:main"
+kd-train-baseline = "src.training.train_student_baseline:main"
+kd-train-distill = "src.training.train_student_distillation:main"
+kd-evaluate = "src.evaluation.evaluate:main"
+kd-compute-costs = "src.evaluation.compute_costs:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
