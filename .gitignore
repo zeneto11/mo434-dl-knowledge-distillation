@@ -24,7 +24,10 @@ checkpoints/
 outputs/
 runs/
 wandb/
-logs/
+old/
+training_logs/
+evaluation/
+figures/
 
 # Model files
 *.pt

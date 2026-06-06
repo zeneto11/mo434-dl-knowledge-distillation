@@ -46,6 +46,10 @@ class TeacherClassifier(nn.Module):
         for parameter in self.encoder.parameters():
             parameter.requires_grad = False
 
+    def unfreeze_last_block(self) -> None:
+        for parameter in self.encoder[-1].parameters():
+            parameter.requires_grad = True
+
     def forward_features(self, x: Tensor) -> tuple[Tensor, Tensor]:
         feature_map = self.encoder(x)
         pooled = torch.flatten(self.pool(feature_map), 1)

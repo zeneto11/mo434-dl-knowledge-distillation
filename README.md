@@ -17,7 +17,7 @@ We will use two image classification datasets:
 | [**FGVC-Aircraft**](https://docs.pytorch.org/vision/main/generated/torchvision.datasets.FGVCAircraft) | Fine-grained classification with subtle visual differences between aircraft variants. Useful to test whether spatial feature-map distillation preserves discriminative structure. |
 | [**Food-101**](https://docs.pytorch.org/vision/main/generated/torchvision.datasets.Food101)           | Larger and more visually diverse dataset, with high variation in texture, background, composition, and class appearance. Useful to test robustness of the distillation strategy.  |
 
-These datasets were chosen instead of common benchmarks such as CIFAR-10, CIFAR-100, or Tiny ImageNet because they provide more interesting domain characteristics and should produce a more meaningful comparison between distillation strategies.
+---
 
 ### Teachers
 
@@ -30,15 +30,25 @@ We will compare two pretrained teacher backbones:
 
 Both teachers are initialized with ImageNet-pretrained weights.
 
+---
+
 ### Student
 
-The main student architecture is:
+We will study a family of lightweight CNN students designed from scratch.
 
-```text
-MobileNetV3-Large encoder + predictor
-```
+The student architecture becomes an experimental variable.
 
-MobileNetV3-Large is used because it is significantly lighter than the teachers, but still expressive enough for FGVC-Aircraft and Food-101.
+| Student   | Encoder structure                             |
+| --------- | --------------------------------------------- |
+| Student-S | Conv32 → Conv64 → Conv128                     |
+| Student-M | Conv32 → Conv64 → Conv128 → Conv256           |
+| Student-L | Conv32 → Conv64 → Conv128 → Conv256 → Conv512 |
+
+All students use the same predictor design for a given distillation target. Only the encoder capacity changes.
+
+This design allows us to study the trade-off between classification performance, parameter count, and GFLOPs.
+
+---
 
 ### Distillation Targets
 
@@ -48,6 +58,8 @@ We will compare two representation targets:
 | -------------------------- | --------------------------------------------------------------------------------------- | ----------------------- |
 | **Pre-GAP feature map**    | Student predicts the teacher's final spatial feature map before global average pooling. | Convolutional predictor |
 | **Post-GAP pooled vector** | Student predicts the teacher's pooled representation after global average pooling.      | MLP predictor           |
+
+---
 
 ### Loss Functions
 
@@ -72,73 +84,119 @@ L_total = alpha * MSE(student_representation, teacher_representation)
 The main experiments are:
 
 ```text
-2 datasets
-× 2 teachers
-× 2 distillation targets
-× 2 losses
-= 16 distilled student models
+Datasets              : 2
+Teachers              : 2
+Student Architectures : 3
+Distillation Targets  : 2
+Loss Functions        : 2
+
+Total:
+2 × 2 × 3 × 2 × 2 = 48 distilled student models
 ```
 
 In addition, we will train:
 
 ```text
-4 teacher classifier models
-2 MobileNetV3-Large baselines trained only with CrossEntropy
+Teacher classifiers:
+2 teacher architectures × 2 datasets
+= 4 models
+
+Student baselines:
+3 student architectures × 2 datasets
+= 6 models
 ```
 
-The MobileNet baselines are important because they answer whether distillation improves over simply training the lightweight model directly on the dataset labels.
+The Student baselines are important because they answer whether distillation improves over simply training the lightweight model directly on the dataset labels.
+
+```text
+Total:
+48 + 6 + 4 = 58 models
+```
 
 ---
 
-## 3. Phase 1 — Train Teacher Classifiers
+## 3. Project Phases
 
-For each dataset and each teacher:
+### Phase 1 — Train Teacher Classifiers
 
-```text
-ImageNet-pretrained teacher
-↓
-Freeze teacher encoder / backbone
-↓
-Replace the original classification head
-↓
-Train a new dataset-specific classifier
-```
+For each dataset and each teacher model, we start from an ImageNet-pretrained teacher and adapt it to the target dataset in two stages.
 
-The four trained teacher systems are:
+**Workflow**
 
-```text
-resnet50_encoder_frozen + resnet50_classifier_aircraft
-resnet50_encoder_frozen + resnet50_classifier_food101
+1. Start with an ImageNet-pretrained teacher.
+2. Freeze the teacher encoder / backbone.
+3. Train the dataset-specific classifier head on the training split.
+4. Validate after each epoch and save the best checkpoint by validation Top-1 accuracy.
+5. Unfreeze the last encoder block.
+6. Fine-tune the last block and classifier head with a smaller learning rate.
+7. Reload the best validation checkpoint.
+8. Run a final test pass on the test split.
 
-convnext_tiny_encoder_frozen + convnext_tiny_classifier_aircraft
-convnext_tiny_encoder_frozen + convnext_tiny_classifier_food101
-```
+**Trained teacher systems:**
 
-During Phase 1:
+| Teacher         | Dataset  | Checkpoint                                                  |
+| --------------- | -------- | ----------------------------------------------------------- |
+| `resnet50`      | Aircraft | `checkpoints/teachers/aircraft_resnet50_classifier.pt`      |
+| `resnet50`      | Food101  | `checkpoints/teachers/food101_resnet50_classifier.pt`       |
+| `convnext_tiny` | Aircraft | `checkpoints/teachers/aircraft_convnext_tiny_classifier.pt` |
+| `convnext_tiny` | Food101  | `checkpoints/teachers/food101_convnext_tiny_classifier.pt`  |
 
-```text
-Train:
-- dataset-specific classifier head
-
-Freeze:
-- teacher encoder / backbone
-```
-
-The trained classifier from this phase will later be reused when training and evaluating the student.
+The best teacher checkpoint from this phase is reused during distillation and evaluation.
 
 ---
 
-## 4. Phase 2 — Train the Student by Representation Distillation
+### Phase 1b — Train Student Baselines
 
-For each combination of dataset, teacher, target, and loss, we train:
+For each dataset and each student architecture, we also train a normal supervised student baseline.
+
+**Workflow**
+
+1. Build the selected student classifier.
+2. Train it directly on the dataset labels using the training split.
+3. Validate after each epoch.
+4. Save the best checkpoint by validation Top-1 accuracy.
+5. Reload the best checkpoint.
+6. Run a final test pass on the test split.
+
+These baselines are used to check whether distillation improves over direct supervised training.
+
+Checkpoint pattern:
 
 ```text
-MobileNetV3-Large encoder + predictor
+checkpoints/students/{dataset}_{student}_baseline.pt
 ```
 
-The teacher encoder and the teacher classifier are kept frozen.
+---
 
-### 4.1 Pre-GAP Feature-Map Distillation
+### Phase 2 — Train Distilled Students
+
+For each combination of:
+
+```text
+dataset
+teacher
+student architecture
+distillation target
+loss function
+```
+
+we train a student encoder and predictor while keeping the trained teacher frozen.
+
+**Workflow**
+
+1. Load the best teacher checkpoint from Phase 1.
+2. Freeze all teacher parameters.
+3. Build the selected student distillation model.
+4. For each training image, compute the teacher representation.
+5. Train the student to match that representation.
+6. If the loss is `mse_ce`, also classify the student representation through the frozen teacher classifier and apply cross-entropy with the true label.
+7. Validate after each epoch.
+8. Save the best student checkpoint:
+   - `mse_ce`: best validation Top-1 accuracy.
+   - `mse`: lowest validation MSE.
+9. Save the training history and best checkpoint path.
+
+#### Pre-GAP Feature-Map Distillation Flow
 
 Teacher path:
 
@@ -155,13 +213,13 @@ Student path:
 ```text
 Input image
 ↓
-MobileNetV3-Large encoder
+Student encoder
 ↓
 Convolutional predictor
 ↓
 Student feature map compatible with teacher feature map
 ↓
-Teacher GAP + frozen teacher classifier
+Frozen teacher GAP + frozen teacher classifier
 ↓
 Class prediction
 ```
@@ -170,25 +228,12 @@ Loss options:
 
 ```text
 MSE(student_feature_map, teacher_feature_map)
-```
 
-or:
-
-```text
 MSE(student_feature_map, teacher_feature_map)
 + CrossEntropy(prediction, label)
 ```
 
-Example model names:
-
-```text
-mobilenet_pregap_resnet50_aircraft_mse
-mobilenet_pregap_resnet50_aircraft_mse_ce
-mobilenet_pregap_convnext_food101_mse
-mobilenet_pregap_convnext_food101_mse_ce
-```
-
-### 4.2 Post-GAP Pooled-Vector Distillation
+#### Post-GAP Pooled-Vector Distillation Flow
 
 Teacher path:
 
@@ -207,9 +252,7 @@ Student path:
 ```text
 Input image
 ↓
-MobileNetV3-Large encoder
-↓
-Global Average Pooling
+Student encoder
 ↓
 MLP predictor
 ↓
@@ -224,11 +267,7 @@ Loss options:
 
 ```text
 MSE(student_vector, teacher_vector)
-```
 
-or:
-
-```text
 MSE(student_vector, teacher_vector)
 + CrossEntropy(prediction, label)
 ```
@@ -236,24 +275,32 @@ MSE(student_vector, teacher_vector)
 Example model names:
 
 ```text
-mobilenet_posgap_resnet50_aircraft_mse
-mobilenet_posgap_resnet50_aircraft_mse_ce
-mobilenet_posgap_convnext_food101_mse
-mobilenet_posgap_convnext_food101_mse_ce
+aircraft_resnet50_student_m_pregap_mse
+aircraft_resnet50_student_m_pregap_mse_ce
+food101_convnext_tiny_student_l_postgap_mse
+food101_convnext_tiny_student_l_postgap_mse_ce
 ```
 
 ---
 
-## 5. Phase 3 — Evaluation
+### Phase 3 — Evaluation
 
-Each trained student is evaluated on the test split of the corresponding dataset.
+The `src.evaluation.evaluate` script runs a test evaluation from saved checkpoints and computes deployment-oriented costs.
 
-Evaluation flow:
+Evaluation covers:
+
+```text
+teacher classifiers
+student CE baselines
+distilled students
+```
+
+Distilled evaluation flow:
 
 ```text
 Input image
 ↓
-MobileNetV3-Large encoder
+Selected student encoder
 ↓
 Selected predictor
 ↓
@@ -262,90 +309,35 @@ Frozen classifier associated with the selected teacher and dataset
 Final prediction
 ```
 
-We will compare:
+Evaluation results are written to:
 
 ```text
-1. ResNet50 teacher vs ConvNeXt-Tiny teacher
-2. Pre-GAP feature-map distillation vs post-GAP pooled-vector distillation
-3. MSE vs MSE + CrossEntropy
-4. Distilled MobileNetV3-Large vs MobileNetV3-Large baseline
-5. Student performance vs teacher performance
-6. Accuracy, parameters, GFLOPs, and inference cost
+results/evaluation/{filename}_eval.json
 ```
 
-Recommended metrics:
+Metrics:
 
-| Metric                   | Purpose                                             |
-| ------------------------ | --------------------------------------------------- |
-| **Top-1 accuracy**       | Main classification metric.                         |
-| **Top-5 accuracy**       | Useful especially for Food-101.                     |
-| **Cross-entropy loss**   | Measures classification quality.                    |
-| **Representation MSE**   | Measures how well the student imitates the teacher. |
-| **Number of parameters** | Measures model compactness.                         |
-| **GFLOPs**               | Measures computational cost.                        |
-| **Inference time**       | Optional practical efficiency metric.               |
+| Metric                   | Purpose                          |
+| ------------------------ | -------------------------------- |
+| **Top-1 accuracy**       | Main classification metric.      |
+| **Top-5 accuracy**       | Secondary classification metric. |
+| **Cross-entropy loss**   | Measures classification quality. |
+| **Representation MSE**   | Measures distillation quality.   |
+| **Number of parameters** | Measures model compactness.      |
+| **GFLOPs**               | Measures computational cost.     |
+| **Inference time**       | Practical efficiency metric.     |
 
 ---
 
-## 6. Suggested Project Organization
-
-```text
-project/
-├── README.md
-├── configs/
-│   ├── aircraft_resnet50.yaml
-│   ├── aircraft_convnext_tiny.yaml
-│   ├── food101_resnet50.yaml
-│   └── food101_convnext_tiny.yaml
-├── data/
-│   └── README.md
-├── src/
-│   ├── datasets/
-│   │   ├── aircraft.py
-│   │   └── food101.py
-│   ├── models/
-│   │   ├── teachers.py
-│   │   ├── students.py
-│   │   └── predictors.py
-│   ├── training/
-│   │   ├── train_teacher_classifier.py
-│   │   ├── train_student_distillation.py
-│   │   └── train_student_baseline.py
-│   ├── evaluation/
-│   │   ├── evaluate.py
-│   │   └── compute_costs.py
-│   └── utils/
-│       ├── losses.py
-│       ├── metrics.py
-│       └── checkpoints.py
-├── notebooks/
-│   ├── analysis_aircraft.ipynb
-│   ├── analysis_food101.ipynb
-│   ├── exploratory_analysis.ipynb
-│   └── results_visualization.ipynb
-├── checkpoints/
-│   ├── teachers/
-│   └── students/
-├── results/
-│   ├── tables/
-│   ├── figures/
-│   └── logs/
-└── report/
-    ├── figures/
-    └── final_report.pdf
-```
-
----
-
-## 7. What the Final Report Should Discuss
+## 4. Core Questions
 
 The final report should answer the core questions from the MO434 project statement:
 
-### 1. Which teacher transfers best?
+### Which teacher transfers best?
 
 Compare ResNet50 and ConvNeXt-Tiny as teachers for both datasets.
 
-### 2. What should the student predict?
+### What should the student predict?
 
 Compare:
 
@@ -357,18 +349,24 @@ post-GAP pooled vector
 
 The pre-GAP target may preserve spatial information better, while the post-GAP target may be easier and cheaper to learn.
 
-### 3. What is the best student encoder + predictor design?
+### What is the best architectures encoder for the student’s encoder + predictor?
 
-The main student is MobileNetV3-Large. The predictor changes according to the distillation target:
+The project compares three custom CNN students:
+
+```text
+Student-S
+Student-M
+Student-L
+```
+
+The predictor depends on the distillation target:
 
 ```text
 pre-GAP  → convolutional predictor
 post-GAP → MLP predictor
 ```
 
-The report should compare their accuracy, representation loss, parameter count, and GFLOPs.
-
-### 4. Which loss function works better?
+### What should we use as a loss function?
 
 Compare:
 
@@ -380,15 +378,9 @@ MSE + CrossEntropy
 
 The expected hypothesis is that MSE + CrossEntropy should produce better classification results because it combines representation matching with label supervision.
 
-### 5. What can be learned from the knowledge distillation literature?
+### What can you learn and use in this project from the literature of knowledge distillation?
 
-The project should connect the implemented method to the papers cited in the assignment.
-
----
-
-## 8. Related Work Mentioned in the Project PDF
-
-The project statement cites the following works as conceptual background:
+The project should connect the implemented method to the papers cited in the assignment:
 
 1. **VGG — Simonyan and Zisserman, 2015**  
    Introduced very deep convolutional networks and serves as a classical CNN reference.
@@ -413,128 +405,57 @@ The project statement cites the following works as conceptual background:
 
 ---
 
-## 9. Expected Main Comparisons
-
-The main result tables should include one row per trained student:
-
-```text
-dataset | teacher | target | loss | top1 | top5 | mse | params | gflops
-```
-
-Recommended tables:
-
-1. Teacher performance on each dataset.
-2. MobileNetV3-Large baseline performance.
-3. Distilled student results for FGVC-Aircraft.
-4. Distilled student results for Food-101.
-5. Best student per teacher.
-6. Best student per dataset.
-7. Accuracy vs GFLOPs trade-off.
-
-Recommended plots:
-
-```text
-- Top-1 accuracy by teacher and target
-- Accuracy vs GFLOPs
-- MSE vs classification accuracy
-- Confusion matrix for the best model on each dataset
-```
-
----
-
-## 10. Final Experimental Summary
+## 5. Final Experimental Summary
 
 The approved experimental setup is:
 
 ```text
-Datasets:
-- FGVC-Aircraft
-- Food-101
+Datasets
+---------
+FGVC-Aircraft
+Food-101
 
-Teachers:
-- ResNet50
-- ConvNeXt-Tiny
+Teachers
+---------
+ResNet50
+ConvNeXt-Tiny
 
-Student:
-- MobileNetV3-Large
+Students
+---------
+Student-S
+Student-M
+Student-L
 
-Predictors:
-- Convolutional predictor for pre-GAP feature-map distillation
-- MLP predictor for post-GAP pooled-vector distillation
+Predictors (targets)
+---------
+Convolutional predictor (Pre-GAP feature map)
+MLP predictor (Post-GAP pooled vector)
 
-Losses:
-- MSE
-- MSE + CrossEntropy
-
-Baselines:
-- Frozen-teacher classifier performance
-- MobileNetV3-Large trained directly with CrossEntropy
+Losses
+---------
+MSE
+MSE + CrossEntropy
 ```
-
-This setup is compact enough to be feasible, but still broad enough to answer the main research questions of the MO434 project.
 
 ---
 
-## 11. Implemented Project Commands
+## 6. Repository Usage
 
 The repository now contains a runnable Python package under `src/`, four YAML configs under `configs/`, and command-line entry points for the three assignment phases.
 
-### Install
+**Environment Setup**
+
+This project uses **Poetry (v2.2.1)** for dependency management.
 
 ```bash
-python3 -m venv .venv
-.venv/bin/pip install -e .
+# Install dependencies and create virtual environment
+poetry install
+
+# Activate the virtual environment
+poetry shell
 ```
 
-If installing PyTorch on a specific CUDA setup, follow the official PyTorch install selector and then run `.venv/bin/pip install -e .`.
+Experiment execution commands are documented in:  
+`COMMANDS.md`
 
-### Phase 1 — Train frozen-encoder teachers
-
-```bash
-.venv/bin/python -m src.training.train_teacher_classifier --config configs/aircraft_resnet50.yaml
-.venv/bin/python -m src.training.train_teacher_classifier --config configs/aircraft_convnext_tiny.yaml
-.venv/bin/python -m src.training.train_teacher_classifier --config configs/food101_resnet50.yaml
-.venv/bin/python -m src.training.train_teacher_classifier --config configs/food101_convnext_tiny.yaml
-```
-
-### Baseline — Train MobileNetV3-Large directly with CE
-
-```bash
-.venv/bin/python -m src.training.train_student_baseline --config configs/aircraft_resnet50.yaml
-.venv/bin/python -m src.training.train_student_baseline --config configs/food101_resnet50.yaml
-```
-
-The baseline does not depend on the teacher, so one config per dataset is enough.
-
-### Phase 2 — Train distilled students
-
-Run these four commands for each dataset-teacher config:
-
-```bash
-.venv/bin/python -m src.training.train_student_distillation --config configs/aircraft_resnet50.yaml --target pregap --loss mse
-.venv/bin/python -m src.training.train_student_distillation --config configs/aircraft_resnet50.yaml --target pregap --loss mse_ce
-.venv/bin/python -m src.training.train_student_distillation --config configs/aircraft_resnet50.yaml --target postgap --loss mse
-.venv/bin/python -m src.training.train_student_distillation --config configs/aircraft_resnet50.yaml --target postgap --loss mse_ce
-```
-
-Repeat with:
-
-```text
-configs/aircraft_convnext_tiny.yaml
-configs/food101_resnet50.yaml
-configs/food101_convnext_tiny.yaml
-```
-
-### Phase 3 — Evaluate and compute costs
-
-```bash
-.venv/bin/python -m src.evaluation.evaluate --config configs/aircraft_resnet50.yaml --kind teacher
-.venv/bin/python -m src.evaluation.evaluate --config configs/aircraft_resnet50.yaml --kind baseline
-.venv/bin/python -m src.evaluation.evaluate --config configs/aircraft_resnet50.yaml --kind distilled --target pregap --loss mse_ce
-
-.venv/bin/python -m src.evaluation.compute_costs --config configs/aircraft_resnet50.yaml --kind teacher
-.venv/bin/python -m src.evaluation.compute_costs --config configs/aircraft_resnet50.yaml --kind baseline
-.venv/bin/python -m src.evaluation.compute_costs --config configs/aircraft_resnet50.yaml --kind distilled --target pregap
-```
-
-Checkpoints are written under `checkpoints/`, and JSON logs are written under `results/logs/`. The configs support `train_limit`, `val_limit`, and `test_limit` for small smoke runs before full training.
+---

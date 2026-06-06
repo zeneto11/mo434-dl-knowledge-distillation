@@ -9,12 +9,14 @@ dataset:
   test_limit: null
 teacher:
   name: resnet50
-student:
-  name: mobilenet_v3_large
+  stage1_epochs: 30
+  stage2_epochs: 15
+  stage2_lr: 5.0e-5
 training:
-  epochs: 10
+  epochs: 30
   lr: 0.001
   weight_decay: 0.0001
+  scheduler: cosine
   alpha: 1.0
   beta: 1.0
   amp: true

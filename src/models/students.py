@@ -2,35 +2,59 @@ from __future__ import annotations
 
 import torch
 from torch import Tensor, nn
-from torchvision.models import MobileNet_V3_Large_Weights, mobilenet_v3_large
 
 from src.models.predictors import ConvFeaturePredictor, MLPPooledPredictor
 from src.models.teachers import TeacherSpec
 
 
-class MobileNetEncoder(nn.Module):
-    def __init__(self, pretrained: bool = True) -> None:
+def _conv_block(in_channels: int, out_channels: int) -> nn.Sequential:
+    return nn.Sequential(
+        nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+        nn.BatchNorm2d(out_channels),
+        nn.SiLU(inplace=True),
+        nn.MaxPool2d(kernel_size=2, stride=2),
+    )
+
+
+STUDENT_CHANNELS: dict[str, list[int]] = {
+    "student_s": [32, 64, 128],
+    "student_m": [32, 64, 128, 256],
+    "student_l": [32, 64, 128, 256, 512],
+}
+
+
+class StudentEncoder(nn.Module):
+    def __init__(self, channels: list[int]) -> None:
         super().__init__()
-        weights = MobileNet_V3_Large_Weights.IMAGENET1K_V2 if pretrained else None
-        model = mobilenet_v3_large(weights=weights)
-        self.features = model.features
-        self.pool = nn.AdaptiveAvgPool2d(1)
-        self.feature_channels = 960
+        layers: list[nn.Module] = []
+        in_ch = 3
+        for out_ch in channels:
+            layers.append(_conv_block(in_ch, out_ch))
+            in_ch = out_ch
+        self.features = nn.Sequential(*layers)
+        self.gap = nn.AdaptiveAvgPool2d(1)
+        self.feature_channels = channels[-1]
 
     def forward_feature_map(self, x: Tensor) -> Tensor:
         return self.features(x)
 
     def forward_pooled(self, x: Tensor) -> Tensor:
-        return torch.flatten(self.pool(self.forward_feature_map(x)), 1)
+        return torch.flatten(self.gap(self.forward_feature_map(x)), 1)
+
+
+def build_student_encoder(name: str) -> StudentEncoder:
+    if name not in STUDENT_CHANNELS:
+        raise ValueError(f"Unknown student: {name!r}. Choose from {sorted(STUDENT_CHANNELS)}")
+    return StudentEncoder(STUDENT_CHANNELS[name])
 
 
 class StudentDistillationModel(nn.Module):
-    def __init__(self, target: str, teacher_spec: TeacherSpec, pretrained: bool = True) -> None:
+    def __init__(self, student_name: str, target: str, teacher_spec: TeacherSpec) -> None:
         super().__init__()
         if target not in {"pregap", "postgap"}:
             raise ValueError("target must be 'pregap' or 'postgap'")
         self.target = target
-        self.encoder = MobileNetEncoder(pretrained=pretrained)
+        self.encoder = build_student_encoder(student_name)
         if target == "pregap":
             self.predictor = ConvFeaturePredictor(
                 self.encoder.feature_channels, teacher_spec.feature_channels)
@@ -45,12 +69,10 @@ class StudentDistillationModel(nn.Module):
 
 
 class StudentBaselineModel(nn.Module):
-    def __init__(self, num_classes: int, pretrained: bool = True) -> None:
+    def __init__(self, student_name: str, num_classes: int) -> None:
         super().__init__()
-        weights = MobileNet_V3_Large_Weights.IMAGENET1K_V2 if pretrained else None
-        self.model = mobilenet_v3_large(weights=weights)
-        in_features = self.model.classifier[-1].in_features
-        self.model.classifier[-1] = nn.Linear(in_features, num_classes)
+        self.encoder = build_student_encoder(student_name)
+        self.classifier = nn.Linear(self.encoder.feature_channels, num_classes)
 
     def forward(self, x: Tensor) -> Tensor:
-        return self.model(x)
+        return self.classifier(self.encoder.forward_pooled(x))

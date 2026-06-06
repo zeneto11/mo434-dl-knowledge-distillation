@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import random
+import time
 from pathlib import Path
 
 import numpy as np
 import torch
 import torch.nn.functional as F
+from loguru import logger
 from torch import nn
 from tqdm import tqdm
 
@@ -32,13 +34,32 @@ def checkpoint_path(config: dict, kind: str, suffix: str) -> Path:
 
 def results_path(config: dict, filename: str) -> Path:
     base = Path(config["outputs"].get("results_dir", "results"))
-    return base / "logs" / filename
+    return base / "training_logs" / filename
+
+
+def eval_results_path(config: dict, filename: str) -> Path:
+    base = Path(config["outputs"].get("results_dir", "results"))
+    return base / "evaluation" / filename
+
+
+def training_log_path(config: dict, experiment_suffix: str) -> Path:
+    base = Path(config["outputs"].get("results_dir", "results"))
+    return base / "training_logs" / f"{experiment_suffix}.log"
+
+
+def setup_run_logger(log_path: Path) -> None:
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    logger.add(
+        str(log_path),
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
+        level="INFO",
+        colorize=False,
+    )
 
 
 def make_optimizer(model: nn.Module, config: dict) -> torch.optim.Optimizer:
     train_cfg = config["training"]
-    params = [parameter for parameter in model.parameters()
-              if parameter.requires_grad]
+    params = [p for p in model.parameters() if p.requires_grad]
     return torch.optim.AdamW(
         params,
         lr=float(train_cfg.get("lr", 1e-3)),
@@ -46,13 +67,23 @@ def make_optimizer(model: nn.Module, config: dict) -> torch.optim.Optimizer:
     )
 
 
+def make_scheduler(optimizer: torch.optim.Optimizer, config: dict, epochs: int):
+    name = config["training"].get("scheduler", "cosine")
+    if name == "cosine":
+        return torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs, eta_min=1e-6)
+    if name == "step":
+        step_size = int(config["training"].get("step_size", max(1, epochs // 3)))
+        gamma = float(config["training"].get("gamma", 0.1))
+        return torch.optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
+    return None
+
+
 def train_classifier_epoch(model: nn.Module, loader, optimizer, device, amp: bool, desc: str) -> dict:
     model.train()
     losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
-    scaler = torch.amp.GradScaler(
-        "cuda", enabled=amp and device.type == "cuda")
+    scaler = torch.amp.GradScaler("cuda", enabled=amp and device.type == "cuda")
     for images, labels in tqdm(loader, desc=desc):
         images = images.to(device, non_blocking=True)
         labels = labels.to(device, non_blocking=True)

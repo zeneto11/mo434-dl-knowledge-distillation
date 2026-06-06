@@ -1,0 +1,45 @@
+{
+  "dataset": "Food-101",
+  "key": "food101",
+  "num_classes": 101,
+  "val_strategy": "every-10th train sample",
+  "image_size_assumption": 224,
+  "normalization": {
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "splits": {
+    "train": {
+      "size": 68175,
+      "num_classes": 101,
+      "min_per_class": 675,
+      "max_per_class": 675,
+      "mean_per_class": 675.0,
+      "imbalance_ratio": 1.0
+    },
+    "val": {
+      "size": 7575,
+      "num_classes": 101,
+      "min_per_class": 75,
+      "max_per_class": 75,
+      "mean_per_class": 75.0,
+      "imbalance_ratio": 1.0
+    },
+    "test": {
+      "size": 25250,
+      "num_classes": 101,
+      "min_per_class": 250,
+      "max_per_class": 250,
+      "mean_per_class": 250.0,
+      "imbalance_ratio": 1.0
+    }
+  }
+}

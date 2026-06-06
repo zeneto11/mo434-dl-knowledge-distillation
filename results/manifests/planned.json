@@ -1,0 +1,2113 @@
+{
+  "total": 116,
+  "runs": [
+    {
+      "name": "teacher_aircraft_resnet50",
+      "phase": "teacher",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_teacher_classifier",
+        "--config",
+        "configs/aircraft_resnet50.yaml"
+      ],
+      "checkpoint": "checkpoints/teachers/aircraft_resnet50_classifier.pt"
+    },
+    {
+      "name": "teacher_aircraft_convnext_tiny",
+      "phase": "teacher",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_teacher_classifier",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml"
+      ],
+      "checkpoint": "checkpoints/teachers/aircraft_convnext_tiny_classifier.pt"
+    },
+    {
+      "name": "teacher_food101_resnet50",
+      "phase": "teacher",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_teacher_classifier",
+        "--config",
+        "configs/food101_resnet50.yaml"
+      ],
+      "checkpoint": "checkpoints/teachers/food101_resnet50_classifier.pt"
+    },
+    {
+      "name": "teacher_food101_convnext_tiny",
+      "phase": "teacher",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_teacher_classifier",
+        "--config",
+        "configs/food101_convnext_tiny.yaml"
+      ],
+      "checkpoint": "checkpoints/teachers/food101_convnext_tiny_classifier.pt"
+    },
+    {
+      "name": "baseline_aircraft_student_s",
+      "phase": "baseline",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_baseline",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_s"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_student_s_baseline.pt"
+    },
+    {
+      "name": "baseline_aircraft_student_m",
+      "phase": "baseline",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_baseline",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_m"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_student_m_baseline.pt"
+    },
+    {
+      "name": "baseline_aircraft_student_l",
+      "phase": "baseline",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_baseline",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_l"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_student_l_baseline.pt"
+    },
+    {
+      "name": "baseline_food101_student_s",
+      "phase": "baseline",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_baseline",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_s"
+      ],
+      "checkpoint": "checkpoints/students/food101_student_s_baseline.pt"
+    },
+    {
+      "name": "baseline_food101_student_m",
+      "phase": "baseline",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_baseline",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_m"
+      ],
+      "checkpoint": "checkpoints/students/food101_student_m_baseline.pt"
+    },
+    {
+      "name": "baseline_food101_student_l",
+      "phase": "baseline",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_baseline",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_l"
+      ],
+      "checkpoint": "checkpoints/students/food101_student_l_baseline.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_s_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_s_pregap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_s_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_s_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_s_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_s_postgap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_s_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_s_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_m_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_m_pregap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_m_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_m_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_m_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_m_postgap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_m_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_m_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_l_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_l_pregap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_l_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_l_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_l_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_l_postgap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_resnet50_student_l_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_resnet50_student_l_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_s_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_s_pregap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_s_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_s_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_s_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_s_postgap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_s_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_s_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_m_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_m_pregap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_m_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_m_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_m_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_m_postgap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_m_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_m_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_l_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_l_pregap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_l_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_l_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_l_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_l_postgap_mse.pt"
+    },
+    {
+      "name": "distill_aircraft_convnext_tiny_student_l_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/aircraft_convnext_tiny_student_l_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_s_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_s_pregap_mse.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_s_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_s_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_s_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_s_postgap_mse.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_s_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_s_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_m_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_m_pregap_mse.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_m_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_m_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_m_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_m_postgap_mse.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_m_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_m_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_l_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_l_pregap_mse.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_l_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_l_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_l_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_l_postgap_mse.pt"
+    },
+    {
+      "name": "distill_food101_resnet50_student_l_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_resnet50_student_l_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_s_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_s_pregap_mse.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_s_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_s_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_s_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_s_postgap_mse.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_s_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_s_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_m_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_m_pregap_mse.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_m_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_m_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_m_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_m_postgap_mse.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_m_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_m_postgap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_l_pregap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_l_pregap_mse.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_l_pregap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_l_pregap_mse_ce.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_l_postgap_mse",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_l_postgap_mse.pt"
+    },
+    {
+      "name": "distill_food101_convnext_tiny_student_l_postgap_mse_ce",
+      "phase": "distill",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.training.train_student_distillation",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "checkpoints/students/food101_convnext_tiny_student_l_postgap_mse_ce.pt"
+    },
+    {
+      "name": "eval_teacher_aircraft_resnet50",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "teacher"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_teacher_eval.json"
+    },
+    {
+      "name": "eval_teacher_aircraft_convnext_tiny",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "teacher"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_teacher_eval.json"
+    },
+    {
+      "name": "eval_teacher_food101_resnet50",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "teacher"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_teacher_eval.json"
+    },
+    {
+      "name": "eval_teacher_food101_convnext_tiny",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "teacher"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_teacher_eval.json"
+    },
+    {
+      "name": "eval_baseline_aircraft_student_s",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "baseline",
+        "--student",
+        "student_s"
+      ],
+      "checkpoint": "results/evaluation/aircraft_student_s_baseline_eval.json"
+    },
+    {
+      "name": "eval_baseline_aircraft_student_m",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "baseline",
+        "--student",
+        "student_m"
+      ],
+      "checkpoint": "results/evaluation/aircraft_student_m_baseline_eval.json"
+    },
+    {
+      "name": "eval_baseline_aircraft_student_l",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "baseline",
+        "--student",
+        "student_l"
+      ],
+      "checkpoint": "results/evaluation/aircraft_student_l_baseline_eval.json"
+    },
+    {
+      "name": "eval_baseline_food101_student_s",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "baseline",
+        "--student",
+        "student_s"
+      ],
+      "checkpoint": "results/evaluation/food101_student_s_baseline_eval.json"
+    },
+    {
+      "name": "eval_baseline_food101_student_m",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "baseline",
+        "--student",
+        "student_m"
+      ],
+      "checkpoint": "results/evaluation/food101_student_m_baseline_eval.json"
+    },
+    {
+      "name": "eval_baseline_food101_student_l",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "baseline",
+        "--student",
+        "student_l"
+      ],
+      "checkpoint": "results/evaluation/food101_student_l_baseline_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_s_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_s_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_s_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_s_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_s_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_s_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_s_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_s_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_m_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_m_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_m_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_m_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_m_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_m_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_m_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_m_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_l_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_l_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_l_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_l_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_l_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_l_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_resnet50_student_l_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_resnet50_student_l_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_s_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_s_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_s_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_s_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_s_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_s_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_s_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_s_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_m_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_m_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_m_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_m_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_m_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_m_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_m_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_m_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_l_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_l_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_l_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_l_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_l_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_l_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_aircraft_convnext_tiny_student_l_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/aircraft_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/aircraft_convnext_tiny_student_l_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_s_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_s_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_s_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_s_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_s_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_s_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_s_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_s_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_m_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_m_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_m_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_m_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_m_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_m_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_m_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_m_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_l_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_l_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_l_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_l_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_l_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_l_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_resnet50_student_l_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_resnet50.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_resnet50_student_l_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_s_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_s_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_s_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_s_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_s_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_s_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_s_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_s",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_s_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_m_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_m_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_m_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_m_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_m_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_m_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_m_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_m",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_m_postgap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_l_pregap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_l_pregap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_l_pregap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "pregap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_l_pregap_mse_ce_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_l_postgap_mse",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_l_postgap_mse_eval.json"
+    },
+    {
+      "name": "eval_distill_food101_convnext_tiny_student_l_postgap_mse_ce",
+      "phase": "evaluate",
+      "cmd": [
+        "/home/zeneto/projects/mo434-dl-knowledge-distillation/.venv/bin/python",
+        "-m",
+        "src.evaluation.evaluate",
+        "--config",
+        "configs/food101_convnext_tiny.yaml",
+        "--kind",
+        "distilled",
+        "--student",
+        "student_l",
+        "--target",
+        "postgap",
+        "--loss",
+        "mse_ce"
+      ],
+      "checkpoint": "results/evaluation/food101_convnext_tiny_student_l_postgap_mse_ce_eval.json"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "dataset": "FGVC-Aircraft",
+  "key": "aircraft",
+  "num_classes": 100,
+  "annotation_level": "variant",
+  "image_size_assumption": 224,
+  "normalization": {
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "splits": {
+    "train": {
+      "size": 3334,
+      "num_classes": 100,
+      "min_per_class": 33,
+      "max_per_class": 34,
+      "mean_per_class": 33.34,
+      "imbalance_ratio": 1.03
+    },
+    "val": {
+      "size": 3333,
+      "num_classes": 100,
+      "min_per_class": 33,
+      "max_per_class": 34,
+      "mean_per_class": 33.33,
+      "imbalance_ratio": 1.03
+    },
+    "test": {
+      "size": 3333,
+      "num_classes": 100,
+      "min_per_class": 33,
+      "max_per_class": 34,
+      "mean_per_class": 33.33,
+      "imbalance_ratio": 1.03
+    }
+  }
+}
