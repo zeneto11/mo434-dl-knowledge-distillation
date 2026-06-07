@@ -4,6 +4,16 @@ This report is generated from JSON files in `results/evaluation`.
 
 Raw accuracies are analyzed separately per dataset. The global section only uses normalized comparisons such as improvement over the dataset baseline, improvement over the matching teacher, and cost ratios.
 
+**Plot conventions:**
+   - colour = student architecture (blue S-S, orange S-M, green S-L);
+   - overlay = distillation target (pre-GAP, post-GAP);
+   - edge = loss (black edge MSE+CE, no edge MSE-only);
+   - shape:  
+       ★ = teacher;  
+       ◆ = CE baseline;  
+       ● = ResNet-50;  
+       ■ = ConvNeXt-Tiny; 
+
 ## Executive Summary By Dataset
 
 - `aircraft`: best student is `convnext_tiny` + `student_l` + `pregap` + `mse_ce` at 55.566% top-1 (19.922 pp vs matching baseline; 77.486% GFLOPs saved vs teacher).
@@ -16,6 +26,9 @@ Raw accuracies are analyzed separately per dataset. The global section only uses
 - Best student CE baseline: `student_l` with 35.644% top-1.
 - Best teacher classifier: `convnext_tiny` with 58.686% top-1.
 - Best distilled student: `convnext_tiny` + `student_l` + `pregap` + `mse_ce` with 55.566% top-1 (19.922 pp vs matching baseline, -3.120 pp vs its teacher).
+
+
+![aircraft distillation gain over CE baseline](../figures/report/aircraft_gain_matrix.png)
 
 ### Evaluation Results
 
@@ -67,8 +80,6 @@ Best configuration found for each teacher:
 | convnext_tiny | student_l    | pregap      | mse_ce    | 55.566    | 86.019    | 19.922              | -3.120             |
 | resnet50      | student_l    | pregap      | mse_ce    | 51.875    | 83.198    | 16.232              | -1.860             |
 
-![aircraft teacher transfer](../figures/report/aircraft_teacher_transfer.png)
-
 ### Question 2: What Should The Student Predict?
 
 **Answer:** `pregap` performs best on this dataset by mean Top-1; this corresponds to pre-GAP feature map with convolutional predictor.
@@ -85,7 +96,7 @@ Best configuration found for each target:
 | pregap  | convnext_tiny | student_l    | mse_ce    | 55.566    | 86.019    | 19.922              | -3.120             |
 | postgap | convnext_tiny | student_l    | mse_ce    | 26.553    | 61.386    | -9.091              | -32.133            |
 
-![aircraft target comparison](../figures/report/aircraft_target_comparison.png)
+![aircraft pre-GAP vs post-GAP](../figures/report/aircraft_pregap_vs_postgap.png)
 
 ### Question 3: What Is The Best Student Architecture?
 
@@ -134,10 +145,10 @@ Architecture ranking with cost savings relative to the matching teacher:
 | resnet50      | student_l | postgap | mse_ce    | 6.961  | 21.452 | 4401028     | 1.967       | 81.440                      | 76.197                      | 3.539          |
 | convnext_tiny | student_s | pregap  | mse       | 3.600  | 13.081 | 515972      | 1.577       | 98.150                      | 82.331                      | 2.283          |
 
-![aircraft student comparison](../figures/report/aircraft_student_comparison.png)
+![aircraft accuracy vs compute (GFLOPs)](../figures/report/aircraft_cost_vs_top1.png)
 
 
-![aircraft cost vs Top-1](../figures/report/aircraft_cost_vs_top1.png)
+![aircraft accuracy vs compute (Params)](../figures/report/aircraft_param_vs_top1.png)
 
 ### Question 4: What Loss Function Should We Use?
 
@@ -155,14 +166,15 @@ Best configuration found for each loss:
 | mse_ce    | convnext_tiny | student_l    | pregap      | 55.566    | 86.019    | 19.922              | -3.120             |
 | mse       | resnet50      | student_l    | pregap      | 39.004    | 75.638    | 3.360               | -14.731            |
 
-![aircraft loss comparison](../figures/report/aircraft_loss_comparison.png)
-
 
 ## Dataset: food101
 
 - Best student CE baseline: `student_l` with 70.234% top-1.
 - Best teacher classifier: `convnext_tiny` with 82.923% top-1.
 - Best distilled student: `convnext_tiny` + `student_l` + `pregap` + `mse_ce` with 68.376% top-1 (-1.857 pp vs matching baseline, -14.547 pp vs its teacher).
+
+
+![food101 distillation gain over CE baseline](../figures/report/food101_gain_matrix.png)
 
 ### Evaluation Results
 
@@ -214,8 +226,6 @@ Best configuration found for each teacher:
 | convnext_tiny | student_l    | pregap      | mse_ce    | 68.376    | 89.370    | -1.857              | -14.547            |
 | resnet50      | student_l    | pregap      | mse       | 68.246    | 90.016    | -1.988              | -11.152            |
 
-![food101 teacher transfer](../figures/report/food101_teacher_transfer.png)
-
 ### Question 2: What Should The Student Predict?
 
 **Answer:** `pregap` performs best on this dataset by mean Top-1; this corresponds to pre-GAP feature map with convolutional predictor.
@@ -232,7 +242,7 @@ Best configuration found for each target:
 | pregap  | convnext_tiny | student_l    | mse_ce    | 68.376    | 89.370    | -1.857              | -14.547            |
 | postgap | resnet50      | student_l    | mse       | 59.604    | 85.390    | -10.630             | -19.794            |
 
-![food101 target comparison](../figures/report/food101_target_comparison.png)
+![food101 pre-GAP vs post-GAP](../figures/report/food101_pregap_vs_postgap.png)
 
 ### Question 3: What Is The Best Student Architecture?
 
@@ -281,10 +291,10 @@ Architecture ranking with cost savings relative to the matching teacher:
 | convnext_tiny | student_s | postgap | mse       | 34.436 | 64.432 | 862341      | 1.036       | 96.909                      | 88.397                      | 33.247         |
 | resnet50      | student_l | postgap | mse_ce    | 32.412 | 61.687 | 4403077     | 1.967       | 81.433                      | 76.197                      | 16.478         |
 
-![food101 student comparison](../figures/report/food101_student_comparison.png)
+![food101 accuracy vs compute (GFLOPs)](../figures/report/food101_cost_vs_top1.png)
 
 
-![food101 cost vs Top-1](../figures/report/food101_cost_vs_top1.png)
+![food101 accuracy vs compute (Params)](../figures/report/food101_param_vs_top1.png)
 
 ### Question 4: What Loss Function Should We Use?
 
@@ -301,8 +311,6 @@ Best configuration found for each loss:
 | --------- | ------------- | ------------ | ----------- | --------- | --------- | ------------------- | ------------------ |
 | mse_ce    | convnext_tiny | student_l    | pregap      | 68.376    | 89.370    | -1.857              | -14.547            |
 | mse       | resnet50      | student_l    | pregap      | 68.246    | 90.016    | -1.988              | -11.152            |
-
-![food101 loss comparison](../figures/report/food101_loss_comparison.png)
 
 
 ## Global Overview With Normalized Comparisons
@@ -347,11 +355,7 @@ Global loss overview using normalized deltas:
 ![Global improvement over baseline](../figures/report/global_improvement_over_baseline.png)
 
 
-![Global cost vs Top-1](../figures/report/global_cost_vs_top1.png)
+![Global accuracy vs compute](../figures/report/global_cost_vs_top1.png)
 
-## Notes
 
-- Per-dataset sections drive the conclusions; FGVC-Aircraft and Food-101 have different accuracy scales.
-- Global tables use normalized quantities to avoid mixing raw Top-1 across datasets.
-- Accuracy values are percentages; `pp` means percentage points.
-- Cost columns (params, GFLOPs, latency) are computed by `src.evaluation.evaluate` alongside accuracy.
+![Global accuracy vs compute (top-5)](../figures/report/global_cost_vs_top5.png)

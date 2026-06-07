@@ -26,7 +26,7 @@ runs/
 wandb/
 old/
 training_logs/
-evaluation/
+results/evaluation/
 figures/
 
 # Model files
