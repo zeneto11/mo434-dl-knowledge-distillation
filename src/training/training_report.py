@@ -639,7 +639,7 @@ def _curve_for_file(epochs: pd.DataFrame, file_name: str, metric: str) -> pd.Dat
 
 
 def _draw_stage_boundary(ax: plt.Axes, run_epochs: pd.DataFrame) -> None:
-    boundary = _stage_transition_epoch(run_epochs)
+    boundary = int(_stage_transition_epoch(run_epochs))
     if boundary is None:
         return
     ax.axvline(boundary, color="#444444", linestyle="--",
@@ -700,13 +700,13 @@ def _plot_two_stage_curves(dataset: str, runs: pd.DataFrame, epochs: pd.DataFram
             _draw_stage_boundary(ax_loss, re_df)
 
     ax_top1.set_title(f"{dataset}: {title} Top-1")
-    ax_top1.set_xlabel("Continuous epoch index")
+    ax_top1.set_xlabel("Epochs")
     ax_top1.set_ylabel("Top-1 (%)")
     ax_top1.grid(alpha=0.25)
     ax_top1.legend(fontsize=8)
 
     ax_loss.set_title(f"{dataset}: {title} loss")
-    ax_loss.set_xlabel("Continuous epoch index")
+    ax_loss.set_xlabel("Epochs")
     ax_loss.set_ylabel("Loss")
     ax_loss.grid(alpha=0.25)
     ax_loss.legend(fontsize=8)
