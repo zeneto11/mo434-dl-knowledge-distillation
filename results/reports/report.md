@@ -18,9 +18,6 @@ Raw accuracies are analyzed separately per dataset. The global section only uses
 
 - `aircraft`: best student is `convnext_tiny` + `student_l` + `pregap` + `mse_ce` at 55.566% top-1 (19.922 pp vs matching baseline; 77.486% GFLOPs saved vs teacher).
 - `food101`: best student is `convnext_tiny` + `student_l` + `pregap` + `mse_ce` at 68.376% top-1 (-1.857 pp vs matching baseline; 77.486% GFLOPs saved vs teacher).
-
-## Dataset-Specific Analysis
-
 ## Dataset: aircraft
 
 - Best student CE baseline: `student_l` with 35.644% top-1.
@@ -165,6 +162,24 @@ Best configuration found for each loss:
 | --------- | ------------- | ------------ | ----------- | --------- | --------- | ------------------- | ------------------ |
 | mse_ce    | convnext_tiny | student_l    | pregap      | 55.566    | 86.019    | 19.922              | -3.120             |
 | mse       | resnet50      | student_l    | pregap      | 39.004    | 75.638    | 3.360               | -14.731            |
+
+### Question 5: How Does Relational Knowledge Distillation Compare?
+
+This question evaluates Relational Knowledge Distillation (Park et al., 2019) as a literature-based extension. Unlike feature distillation, RKD keeps the student's own classifier and transfers the *relations* between examples, namely normalized pairwise distances and triplet angles computed over the pooled embeddings, rather than forcing the student to match the teacher's feature values directly.
+
+Because these relations are computed within each model's embedding space, the teacher and student embedding dimensions do not need to match. RKD is trained on the same `convnext_tiny` + `student_l` pair as the strongest feature-distillation configuration, allowing a direct comparison between the two distillation paradigms.
+
+**Answer:** RKD reaches 27.063% Top-1, which trails the best feature-distillation result for the same pair by 28.503 pp and is 8.581 pp below the CE baseline.
+
+| method                    | top1   | top5   | top1_minus_baseline | top1_minus_teacher | cost_params | cost_gflops | gflops_saved_vs_teacher_pct |
+| ------------------------- | ------ | ------ | ------------------- | ------------------ | ----------- | ----------- | --------------------------- |
+| CE baseline               | 35.644 | 69.337 | 0.000               |                    | 1620868     | 1.961       |                             |
+| Best feature distillation | 55.566 | 86.019 | 19.922              | -3.120             | 2139524     | 2.010       | 77.486                      |
+| RKD (relational)          | 27.063 | 62.226 | -8.581              | -31.623            | 1620868     | 1.961       | 78.028                      |
+| Teacher                   | 58.686 | 87.999 |                     | 0.000              | 27895492    | 8.927       | 0.000                       |
+
+
+![aircraft RKD comparison](../figures/report/aircraft_rkd_comparison.png)
 
 
 ## Dataset: food101
@@ -311,6 +326,24 @@ Best configuration found for each loss:
 | --------- | ------------- | ------------ | ----------- | --------- | --------- | ------------------- | ------------------ |
 | mse_ce    | convnext_tiny | student_l    | pregap      | 68.376    | 89.370    | -1.857              | -14.547            |
 | mse       | resnet50      | student_l    | pregap      | 68.246    | 90.016    | -1.988              | -11.152            |
+
+### Question 5: How Does Relational Knowledge Distillation Compare?
+
+This question evaluates Relational Knowledge Distillation (Park et al., 2019) as a literature-based extension. Unlike feature distillation, RKD keeps the student's own classifier and transfers the *relations* between examples, namely normalized pairwise distances and triplet angles computed over the pooled embeddings, rather than forcing the student to match the teacher's feature values directly.
+
+Because these relations are computed within each model's embedding space, the teacher and student embedding dimensions do not need to match. RKD is trained on the same `convnext_tiny` + `student_l` pair as the strongest feature-distillation configuration, allowing a direct comparison between the two distillation paradigms.
+
+**Answer:** RKD reaches 70.016% Top-1, which outperforms the best feature-distillation result for the same pair by 1.640 pp and is 0.218 pp below the CE baseline.
+
+| method                    | top1   | top5   | top1_minus_baseline | top1_minus_teacher | cost_params | cost_gflops | gflops_saved_vs_teacher_pct |
+| ------------------------- | ------ | ------ | ------------------- | ------------------ | ----------- | ----------- | --------------------------- |
+| CE baseline               | 70.234 | 90.388 | 0.000               |                    | 1621381     | 1.961       |                             |
+| Best feature distillation | 68.376 | 89.370 | -1.857              | -14.547            | 2140293     | 2.010       | 77.486                      |
+| RKD (relational)          | 70.016 | 89.929 | -0.218              | -12.907            | 1621381     | 1.961       | 78.028                      |
+| Teacher                   | 82.923 | 96.281 |                     | 0.000              | 27896261    | 8.927       | 0.000                       |
+
+
+![food101 RKD comparison](../figures/report/food101_rkd_comparison.png)
 
 
 ## Global Overview With Normalized Comparisons

@@ -72,7 +72,8 @@ def make_scheduler(optimizer: torch.optim.Optimizer, config: dict, epochs: int):
     if name == "cosine":
         return torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs, eta_min=1e-6)
     if name == "step":
-        step_size = int(config["training"].get("step_size", max(1, epochs // 3)))
+        step_size = int(config["training"].get(
+            "step_size", max(1, epochs // 3)))
         gamma = float(config["training"].get("gamma", 0.1))
         return torch.optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
     return None
@@ -83,7 +84,8 @@ def train_classifier_epoch(model: nn.Module, loader, optimizer, device, amp: boo
     losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
-    scaler = torch.amp.GradScaler("cuda", enabled=amp and device.type == "cuda")
+    scaler = torch.amp.GradScaler(
+        "cuda", enabled=amp and device.type == "cuda")
     for images, labels in tqdm(loader, desc=desc):
         images = images.to(device, non_blocking=True)
         labels = labels.to(device, non_blocking=True)

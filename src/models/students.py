@@ -9,7 +9,8 @@ from src.models.teachers import TeacherSpec
 
 def _conv_block(in_channels: int, out_channels: int) -> nn.Sequential:
     return nn.Sequential(
-        nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+        nn.Conv2d(in_channels, out_channels,
+                  kernel_size=3, padding=1, bias=False),
         nn.BatchNorm2d(out_channels),
         nn.SiLU(inplace=True),
         nn.MaxPool2d(kernel_size=2, stride=2),
@@ -44,7 +45,8 @@ class StudentEncoder(nn.Module):
 
 def build_student_encoder(name: str) -> StudentEncoder:
     if name not in STUDENT_CHANNELS:
-        raise ValueError(f"Unknown student: {name!r}. Choose from {sorted(STUDENT_CHANNELS)}")
+        raise ValueError(
+            f"Unknown student: {name!r}. Choose from {sorted(STUDENT_CHANNELS)}")
     return StudentEncoder(STUDENT_CHANNELS[name])
 
 
@@ -76,3 +78,19 @@ class StudentBaselineModel(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return self.classifier(self.encoder.forward_pooled(x))
+
+
+class StudentRKDModel(nn.Module):
+    """Student trained with relational knowledge distillation."""
+
+    def __init__(self, student_name: str, num_classes: int) -> None:
+        super().__init__()
+        self.encoder = build_student_encoder(student_name)
+        self.classifier = nn.Linear(self.encoder.feature_channels, num_classes)
+
+    def forward(self, x: Tensor) -> Tensor:
+        return self.classifier(self.encoder.forward_pooled(x))
+
+    def forward_with_embedding(self, x: Tensor) -> tuple[Tensor, Tensor]:
+        embedding = self.encoder.forward_pooled(x)
+        return embedding, self.classifier(embedding)

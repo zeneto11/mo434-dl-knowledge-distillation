@@ -84,6 +84,10 @@ def collect_results(eval_dir: Path) -> pd.DataFrame:
         rf"^(?P<dataset>.+?)_(?P<teacher>{'|'.join(TEACHERS)})_(?P<student>{'|'.join(STUDENTS)})_"
         rf"(?P<target>{'|'.join(TARGETS)})_(?P<loss>{'|'.join(LOSSES)})_eval\.json$"
     )
+    rkd_pattern = re.compile(
+        rf"^(?P<dataset>.+?)_(?P<teacher>{'|'.join(TEACHERS)})_(?P<student>{'|'.join(STUDENTS)})_"
+        rf"rkd_eval\.json$"
+    )
 
     for path in sorted(eval_dir.glob("*_eval.json")):
         metrics = _flatten_metrics(_load_json(path))
@@ -93,6 +97,12 @@ def collect_results(eval_dir: Path) -> pd.DataFrame:
             row.update(match.groupdict())
             row["model_type"] = "distilled"
             row["model"] = f"{row['student']} distilled"
+        elif match := rkd_pattern.match(path.name):
+            row.update(match.groupdict())
+            row["model_type"] = "rkd"
+            row["model"] = f"{row['student']} rkd"
+            row["target"] = "rkd"
+            row["loss_name"] = "rkd"
         elif match := teacher_pattern.match(path.name):
             row.update(match.groupdict())
             row["model_type"] = "teacher"
@@ -684,6 +694,50 @@ def _plot_gain_matrix(
     return str(path)
 
 
+def _plot_rkd_comparison(
+    dataset: str, comparison: pd.DataFrame, figures_dir: Path
+) -> str | None:
+    """Bar chart comparing RKD against the CE baseline, the best feature
+    distillation, and the teacher for the shared convnext_tiny + Student-L pair."""
+    plot_df = comparison.dropna(subset=["top1"])
+    if plot_df.empty:
+        return None
+
+    colors = {
+        "CE baseline": "#7f7f7f",
+        "Best feature distillation": STUDENT_COLORS["student_l"],
+        "RKD (relational)": "#d62728",
+        "Teacher": TEACHER_COLOR,
+    }
+    bar_colors = [colors.get(label, "#333333") for label in plot_df["method"]]
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    bars = ax.bar(plot_df["method"], plot_df["top1"], color=bar_colors)
+    for bar, value in zip(bars, plot_df["top1"]):
+        ax.annotate(f"{value:.1f}%", (bar.get_x() + bar.get_width() / 2, value),
+                    xytext=(0, 3), textcoords="offset points",
+                    ha="center", fontsize=9, fontweight="bold")
+
+    baseline_rows = plot_df[plot_df["method"] == "CE baseline"]
+    if not baseline_rows.empty:
+        ax.axhline(float(baseline_rows.iloc[0]["top1"]), color="#7f7f7f",
+                   linestyle="--", linewidth=1.0, alpha=0.7, zorder=0)
+
+    ax.set_title(f"{dataset}: RKD vs feature distillation (ConvNeXt-Tiny → Student-L)",
+                 fontsize=12)
+    ax.set_ylabel("Top-1 accuracy (%)")
+    ax.set_xticks(range(len(plot_df)))
+    ax.set_xticklabels(plot_df["method"], rotation=15, ha="right", fontsize=9)
+    ax.grid(axis="y", alpha=0.25)
+    plt.tight_layout()
+
+    path = figures_dir / f"{_safe_name(dataset)}_rkd_comparison.png"
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    plt.savefig(path, dpi=180)
+    plt.close()
+    return str(path)
+
+
 def _make_dataset_plots(dataset: str, dataset_df: pd.DataFrame, figures_dir: Path) -> dict[str, str]:
     plots: dict[str, str] = {}
     distilled = dataset_df[dataset_df["model_type"] == "distilled"].copy()
@@ -711,6 +765,9 @@ def _make_dataset_plots(dataset: str, dataset_df: pd.DataFrame, figures_dir: Pat
 
 def _make_global_plots(df: pd.DataFrame, figures_dir: Path) -> dict[str, str]:
     plots: dict[str, str] = {}
+    # The global overview covers the core experiment matrix; the RKD extension is
+    # reported per dataset in Question 5.
+    df = df[df["model_type"] != "rkd"].copy()
     distilled = df[df["model_type"] == "distilled"].copy()
     figures_dir.mkdir(parents=True, exist_ok=True)
 
@@ -948,6 +1005,120 @@ def _add_plot(lines: list[str], title: str, path: str | None, output: Path) -> N
         ["", f"![{title}]({_relative_path(path, output.parent)})", ""])
 
 
+def _rkd_comparison_frame(dataset_df: pd.DataFrame, rkd_row: pd.Series) -> pd.DataFrame:
+    """Assemble the methods compared against RKD for one teacher + student pair:
+    the matching CE baseline, the best feature distillation, RKD, and the teacher."""
+    teacher = rkd_row.get("teacher")
+    student = rkd_row.get("student")
+    columns = ["method", "top1", "top5", "top1_minus_baseline",
+               "top1_minus_teacher", "cost_params", "cost_gflops",
+               "gflops_saved_vs_teacher_pct"]
+
+    def _pick(row: pd.Series | None, method: str) -> dict[str, Any]:
+        if row is None:
+            return {"method": method}
+        return {
+            "method": method,
+            "top1": row.get("top1"),
+            "top5": row.get("top5"),
+            "top1_minus_baseline": row.get("top1_minus_baseline"),
+            "top1_minus_teacher": row.get("top1_minus_teacher"),
+            "cost_params": row.get("cost_params"),
+            "cost_gflops": row.get("cost_gflops"),
+            "gflops_saved_vs_teacher_pct": row.get("gflops_saved_vs_teacher_pct"),
+        }
+
+    baseline = dataset_df[
+        (dataset_df["model_type"] == "baseline") & (
+            dataset_df["student"] == student)
+    ]
+    feature = dataset_df[
+        (dataset_df["model_type"] == "distilled")
+        & (dataset_df["teacher"] == teacher)
+        & (dataset_df["student"] == student)
+    ]
+    teacher_row = dataset_df[
+        (dataset_df["model_type"] == "teacher") & (
+            dataset_df["teacher"] == teacher)
+    ]
+
+    rows = [
+        _pick(_best_row(baseline), "CE baseline"),
+        _pick(_best_row(feature), "Best feature distillation"),
+        _pick(rkd_row, "RKD (relational)"),
+        _pick(_best_row(teacher_row), "Teacher"),
+    ]
+    return pd.DataFrame(rows, columns=columns)
+
+
+def _question5_section(
+    dataset: str, dataset_df: pd.DataFrame, output: Path, figures_dir: Path
+) -> list[str]:
+    lines = [
+        "### Question 5: How Does Relational Knowledge Distillation Compare?",
+        "",
+        "This question evaluates Relational Knowledge Distillation (Park et al., 2019) "
+        "as a literature-based extension. Unlike feature distillation, RKD keeps the "
+        "student's own classifier and transfers the *relations* between examples, "
+        "namely normalized pairwise distances and triplet angles computed over the "
+        "pooled embeddings, rather than forcing the student to match the teacher's "
+        "feature values directly.",
+        "",
+        "Because these relations are computed within each model's embedding space, "
+        "the teacher and student embedding dimensions do not need to match. RKD is "
+        "trained on the same `convnext_tiny` + `student_l` pair as the strongest "
+        "feature-distillation configuration, allowing a direct comparison between "
+        "the two distillation paradigms.",
+        "",
+    ]
+    rkd_df = dataset_df[dataset_df["model_type"] == "rkd"]
+    rkd_row = _best_row(rkd_df)
+    if rkd_row is None:
+        lines.append(
+            "**Answer:** no RKD result is available for this dataset yet.")
+        lines.append("")
+        return lines
+
+    comparison = _rkd_comparison_frame(dataset_df, rkd_row)
+    feature_top1 = comparison.loc[
+        comparison["method"] == "Best feature distillation", "top1"]
+    baseline_top1 = comparison.loc[comparison["method"]
+                                   == "CE baseline", "top1"]
+    rkd_top1 = float(rkd_row.get("top1")) if pd.notna(
+        rkd_row.get("top1")) else None
+
+    if rkd_top1 is not None and not feature_top1.empty and pd.notna(feature_top1.iloc[0]):
+        delta_feature = rkd_top1 - float(feature_top1.iloc[0])
+        verb = "outperforms" if delta_feature > 0 else "trails"
+        baseline_text = ""
+        if not baseline_top1.empty and pd.notna(baseline_top1.iloc[0]):
+            delta_baseline = rkd_top1 - float(baseline_top1.iloc[0])
+            baseline_text = (
+                f" and is {abs(delta_baseline):.3f} pp "
+                f"{'above' if delta_baseline >= 0 else 'below'} the CE baseline"
+            )
+        lines.append(
+            f"**Answer:** RKD reaches {rkd_top1:.3f}% Top-1, which {verb} the best "
+            f"feature-distillation result for the same pair by {abs(delta_feature):.3f} pp"
+            f"{baseline_text}."
+        )
+    else:
+        lines.append(f"**Answer:** RKD reaches {rkd_top1:.3f}% Top-1." if rkd_top1 is not None
+                     else "**Answer:** RKD result is incomplete.")
+    lines.append("")
+
+    lines.append(markdown_table(comparison, [
+        "method", "top1", "top5", "top1_minus_baseline", "top1_minus_teacher",
+        "cost_params", "cost_gflops", "gflops_saved_vs_teacher_pct",
+    ]))
+    lines.append("")
+
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    plot_path = _plot_rkd_comparison(dataset, comparison, figures_dir)
+    _add_plot(lines, f"{dataset} RKD comparison", plot_path, output)
+    return lines
+
+
 def _dataset_section(
     dataset: str, dataset_df: pd.DataFrame, output: Path, figures_dir: Path
 ) -> list[str]:
@@ -996,10 +1167,12 @@ def _dataset_section(
         output,
     )
 
+    # The RKD study is reported separately in Question 5
+    matrix_df = dataset_df[dataset_df["model_type"] != "rkd"]
     lines.extend([
         "### Evaluation Results", "",
         markdown_table(
-            dataset_df.sort_values(
+            matrix_df.sort_values(
                 ["model_type", "teacher", "student", "target", "loss_name"], na_position="last"),
             result_columns,
         ),
@@ -1112,6 +1285,9 @@ def _dataset_section(
         "",
     ])
 
+    # Q5: Literature extension — Relational Knowledge Distillation.
+    lines.extend(_question5_section(dataset, dataset_df, output, figures_dir))
+
     return lines
 
 
@@ -1161,7 +1337,7 @@ def generate_report(df: pd.DataFrame, output: Path, figures_dir: Path) -> None:
             f"{_format_number(best_student.get('gflops_saved_vs_teacher_pct'))}% GFLOPs saved vs teacher)."
         )
 
-    lines.extend(["", "## Dataset-Specific Analysis", ""])
+    # lines.extend(["", "## Dataset-Specific Analysis", ""])
     for dataset in datasets:
         lines.extend(_dataset_section(
             dataset, df[df["dataset"] == dataset].copy(), output, figures_dir))

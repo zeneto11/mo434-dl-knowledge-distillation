@@ -306,10 +306,10 @@ def _summarize_run(path: Path, data: dict[str, Any], meta: dict[str, Any], epoch
         "stage_transition_epoch": _stage_transition_epoch(epoch_df),
         "selection_metric": selection_metric,
         "selection_reason": selection_reason,
-        # LOCAL best epoch (resets per stage) -- kept for completeness
+        # LOCAL best epoch (resets per stage)
         "best_epoch": best.get("epoch"),
         "best_stage": best.get("stage"),
-        # CONTINUOUS best epoch -- this is what should be displayed for teachers
+        # CONTINUOUS best epoch
         "best_epoch_index": int(best.get("epoch_index")) if pd.notna(best.get("epoch_index")) else None,
         "best_stage_int": int(best.get("stage")) if pd.notna(best.get("stage")) else None,
     }
@@ -692,8 +692,7 @@ def _plot_two_stage_curves(dataset: str, runs: pd.DataFrame, epochs: pd.DataFram
         plt.close(fig)
         return None
 
-    # Draw stage boundaries AFTER axes are populated (fixes the original bug
-    # where only the last run's boundary was drawn, after the loop).
+    # Draw stage boundaries AFTER axes are populated
     if mark_stages:
         for re_df in boundary_epochs:
             _draw_stage_boundary(ax_top1, re_df)
@@ -996,8 +995,7 @@ def _critical_warnings_block(lines: list[str], df: pd.DataFrame, max_items: int 
         lines.append("")
         return
 
-    # If one warning pattern dominates many runs, summarise it once instead of
-    # repeating it per run.
+    # If one warning pattern dominates many runs, summarise it once instead of repeating it per run.
     pattern_counts = flagged["warnings"].value_counts()
     widespread = pattern_counts[pattern_counts >= max_items]
     for pattern, count in widespread.items():
@@ -1094,8 +1092,7 @@ def _dataset_section(dataset: str, runs: pd.DataFrame, epochs: pd.DataFrame,
             f"{_format_number(best_mse.get('best_val_mse'), 4)} val MSE.")
     lines.append("")
 
-    # The big combined table you want to keep -- one row per distilled run,
-    # concatenating the whole JSON's key signals.
+    # Big combined table
     lines.extend(["### All distilled runs", ""])
     lines.append(markdown_table(
         _sort_existing(

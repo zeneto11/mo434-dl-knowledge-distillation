@@ -1,8 +1,10 @@
 # MO434 Project — Knowledge Distillation from Pretrained Image Classifiers into a Lightweight ConvNet
 
-This project follows the MO434 assignment **“A Comparative Study of Knowledge Distillation Schemes from Pretrained Image Classifiers into a Lightweight ConvNet.”** The goal is to study how well a lightweight CNN student can imitate representations produced by pretrained image classifiers while reducing parameters and GFLOPs.
+This project follows the MO434 assignment **“A Comparative Study of Knowledge Distillation Schemes from Pretrained Image Classifiers into a Lightweight ConvNet.”**  
+The goal is to study how well a lightweight CNN student can imitate representations produced by pretrained image classifiers while reducing parameters and GFLOPs.
 
-The experimental setup is based on representation-based knowledge distillation. Instead of only distilling the teacher logits, the student is trained to predict either the teacher's **pre-GAP feature map** or the teacher's **post-GAP pooled representation**. An additional cross-entropy term can be used to keep the student representation aligned with the dataset labels.
+The experimental setup is based on representation-based knowledge distillation. Instead of only distilling the teacher logits, the student is trained to predict either the teacher's **pre-GAP feature map** or the teacher's **post-GAP pooled representation**.  
+An additional cross-entropy term can be used to keep the student representation aligned with the dataset labels.
 
 ---
 
@@ -315,6 +317,44 @@ Evaluation results are written to:
 results/evaluation/{filename}_eval.json
 ```
 
+---
+
+### Phase 4 — Relational Knowledge Distillation (Literature Extension)
+
+To address core Question 5 (what can be reused from the literature), we add Relational Knowledge Distillation (Park et al., 2019) as a separate phase.
+
+**How it differs from the core matrix**
+
+| Aspect             | Feature distillation (Phases 2–3)          | Relational distillation (Phase 4)                 |
+| ------------------ | ------------------------------------------ | ------------------------------------------------- |
+| Student classifier | Frozen teacher head                        | Student's own trained linear classifier           |
+| Transferred signal | Teacher pre-/post-GAP representation (MSE) | Pairwise distances + triplet angles of embeddings |
+| Label supervision  | Optional CE through the teacher head       | Cross-entropy on the student's own logits         |
+| Space alignment    | Predictor must match teacher channels/dim  | None — relations are computed inside each space   |
+
+**Workflow**
+
+1. Load the best frozen Phase 1 teacher.
+2. Build a the best student architecture encoder with its own classifier.
+3. For each batch, compute the teacher's pooled embeddings.
+4. Train the student with cross-entropy on the labels plus the RKD
+   distance-wise and angle-wise losses between student and teacher embeddings.
+5. Save the best checkpoint by validation Top-1 accuracy.
+
+```text
+L_total = ce_weight      * CrossEntropy(student_logits, label)
+        + distance_weight * RKD_distance(student_embed, teacher_embed)
+        + angle_weight    * RKD_angle(student_embed, teacher_embed)
+```
+
+The relational method is compared head-to-head with the strongest feature-distillation configuration without changing the 48-model matrix.
+
+Checkpoint pattern:
+
+```text
+checkpoints/students/{dataset}_{teacher}_{student}_rkd.pt
+```
+
 Metrics:
 
 | Metric                   | Purpose                          |
@@ -380,7 +420,7 @@ The expected hypothesis is that MSE + CrossEntropy should produce better classif
 
 ### What can you learn and use in this project from the literature of knowledge distillation?
 
-The project should connect the implemented method to the papers cited in the assignment:
+Papers cited in the assignment:
 
 1. **VGG — Simonyan and Zisserman, 2015**  
    Introduced very deep convolutional networks and serves as a classical CNN reference.
@@ -401,13 +441,13 @@ The project should connect the implemented method to the papers cited in the ass
    Proposed transferring spatial attention maps. This is relevant to the pre-GAP setting, where spatial structure is preserved.
 
 7. **Relational Knowledge Distillation — Park et al., 2019**  
-   Proposed transferring relations among samples rather than only matching individual outputs. This can be discussed as a possible extension if time allows.
+   Proposed transferring relations among samples rather than only matching individual outputs.
 
 ---
 
 ## 5. Final Experimental Summary
 
-The approved experimental setup is:
+The experimental setup is:
 
 ```text
 Datasets

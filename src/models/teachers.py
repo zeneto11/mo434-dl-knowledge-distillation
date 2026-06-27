@@ -39,7 +39,8 @@ class TeacherClassifier(nn.Module):
         else:
             raise ValueError(f"Unsupported teacher: {name}")
 
-        self.spec = TeacherSpec(feature_dim=feature_dim, feature_channels=feature_channels)
+        self.spec = TeacherSpec(feature_dim=feature_dim,
+                                feature_channels=feature_channels)
         self.classifier = nn.Linear(feature_dim, num_classes)
 
     def freeze_encoder(self) -> None:

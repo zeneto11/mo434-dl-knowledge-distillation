@@ -41,11 +41,15 @@ def run(config: dict) -> dict:
     stage2_epochs = int(config["teacher"].get("stage2_epochs", 15))
     stage2_lr = float(config["teacher"].get("stage2_lr", 5e-5))
 
-    setup_run_logger(training_log_path(config, f"{dataset}_{teacher_name}_teacher"))
-    logger.info(f"teacher={teacher_name} dataset={dataset} device={device} seed={seed} num_classes={data.num_classes}")
-    logger.info(f"stage1_epochs={stage1_epochs} stage2_epochs={stage2_epochs} stage2_lr={stage2_lr:.2e}")
+    setup_run_logger(training_log_path(
+        config, f"{dataset}_{teacher_name}_teacher"))
+    logger.info(
+        f"teacher={teacher_name} dataset={dataset} device={device} seed={seed} num_classes={data.num_classes}")
+    logger.info(
+        f"stage1_epochs={stage1_epochs} stage2_epochs={stage2_epochs} stage2_lr={stage2_lr:.2e}")
 
-    model = build_teacher(teacher_name, data.num_classes, pretrained=True).to(device)
+    model = build_teacher(teacher_name, data.num_classes,
+                          pretrained=True).to(device)
     best_top1 = -1.0
     history = []
     best_path = str(
@@ -68,7 +72,8 @@ def run(config: dict) -> dict:
             model, data.val, device, amp, f"teacher val {epoch}/{stage1_epochs}")
         elapsed = time.perf_counter() - t0
         lr = optimizer1.param_groups[0]["lr"]
-        history.append({"stage": 1, "epoch": epoch, "train": train_m, "val": val_m})
+        history.append({"stage": 1, "epoch": epoch,
+                       "train": train_m, "val": val_m})
         logger.info(
             f"stage=1 epoch={epoch}/{stage1_epochs} "
             f"train_loss={train_m['loss']:.4f} train_top1={train_m['top1']:.2f} "
@@ -77,7 +82,8 @@ def run(config: dict) -> dict:
         )
         if val_m["top1"] > best_top1:
             best_top1 = val_m["top1"]
-            save_checkpoint(best_path, model, {"kind": "teacher", "stage": 1, "epoch": epoch, "val": val_m})
+            save_checkpoint(best_path, model, {
+                            "kind": "teacher", "stage": 1, "epoch": epoch, "val": val_m})
         if scheduler1:
             scheduler1.step()
 
@@ -101,7 +107,8 @@ def run(config: dict) -> dict:
                 model, data.val, device, amp, f"teacher val s2 {epoch}/{stage2_epochs}")
             elapsed = time.perf_counter() - t0
             lr = optimizer2.param_groups[0]["lr"]
-            history.append({"stage": 2, "epoch": epoch, "train": train_m, "val": val_m})
+            history.append({"stage": 2, "epoch": epoch,
+                           "train": train_m, "val": val_m})
             logger.info(
                 f"stage=2 epoch={epoch}/{stage2_epochs} "
                 f"train_loss={train_m['loss']:.4f} train_top1={train_m['top1']:.2f} "
@@ -110,15 +117,18 @@ def run(config: dict) -> dict:
             )
             if val_m["top1"] > best_top1:
                 best_top1 = val_m["top1"]
-                save_checkpoint(best_path, model, {"kind": "teacher", "stage": 2, "epoch": epoch, "val": val_m})
+                save_checkpoint(best_path, model, {
+                                "kind": "teacher", "stage": 2, "epoch": epoch, "val": val_m})
             scheduler2.step()
 
     load_checkpoint(best_path, model, map_location=device)
     test_m = evaluate_classifier(model, data.test, device, amp, "teacher test")
-    logger.info(f"test_top1={test_m['top1']:.2f} test_top5={test_m['top5']:.2f}")
+    logger.info(
+        f"test_top1={test_m['top1']:.2f} test_top5={test_m['top5']:.2f}")
 
     metrics = {"history": history, "test": test_m, "checkpoint": best_path}
-    write_metrics(results_path(config, f"{dataset}_{teacher_name}_teacher.json"), metrics)
+    write_metrics(results_path(
+        config, f"{dataset}_{teacher_name}_teacher.json"), metrics)
     return metrics
 
 

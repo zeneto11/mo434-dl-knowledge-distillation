@@ -21,6 +21,10 @@ training:
   beta: 1.0
   amp: true
   seed: 42
+rkd:
+  distance_weight: 25.0
+  angle_weight: 50.0
+  ce_weight: 1.0
 outputs:
   checkpoint_dir: checkpoints
   results_dir: results

@@ -140,6 +140,40 @@ Eval results: `results/evaluation/{filename}_eval.json`
 
 ---
 
+## Phase 4 — Relational Knowledge Distillation (Literature Extension)
+
+A focused study comparing the systematic feature-distillation matrix against
+Relational Knowledge Distillation (Park et al., 2019).
+
+### Train
+
+```bash
+python -m src.training.train_student_rkd \
+    --config configs/aircraft_convnext_tiny.yaml --student student_l
+python -m src.training.train_student_rkd \
+    --config configs/food101_convnext_tiny.yaml --student student_l
+```
+
+Checkpoints: `checkpoints/students/{dataset}_{teacher}_{student}_rkd.pt`
+Training logs: `results/training_logs/{dataset}_{teacher}_{student}_rkd.log`
+
+### Evaluate
+
+```bash
+python -m src.evaluation.evaluate_rkd \
+    --config configs/aircraft_convnext_tiny.yaml --student student_l
+python -m src.evaluation.evaluate_rkd \
+    --config configs/food101_convnext_tiny.yaml --student student_l
+```
+
+Add `--skip-costs` to skip GFLOPs/latency computation.
+Eval results: `results/evaluation/{dataset}_{teacher}_{student}_rkd_eval.json`
+
+The RKD results feed the per-dataset **Question 5** section of the main report
+without altering the core 48-model matrix.
+
+---
+
 ## Report Generation
 
 ```bash

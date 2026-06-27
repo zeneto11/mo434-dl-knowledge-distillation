@@ -37,8 +37,10 @@ def run(config: dict, student_name: str) -> dict:
     data = build_dataloaders(config)
 
     dataset = config["dataset"]["name"]
-    setup_run_logger(training_log_path(config, f"{dataset}_{student_name}_baseline"))
-    logger.info(f"student={student_name} dataset={dataset} device={device} seed={seed} num_classes={data.num_classes}")
+    setup_run_logger(training_log_path(
+        config, f"{dataset}_{student_name}_baseline"))
+    logger.info(
+        f"student={student_name} dataset={dataset} device={device} seed={seed} num_classes={data.num_classes}")
 
     model = StudentBaselineModel(student_name, data.num_classes).to(device)
     optimizer = make_optimizer(model, config)
@@ -72,18 +74,23 @@ def run(config: dict, student_name: str) -> dict:
             scheduler.step()
 
     load_checkpoint(best_path, model, map_location=device)
-    test_m = evaluate_classifier(model, data.test, device, amp, "baseline test")
-    logger.info(f"test_top1={test_m['top1']:.2f} test_top5={test_m['top5']:.2f}")
+    test_m = evaluate_classifier(
+        model, data.test, device, amp, "baseline test")
+    logger.info(
+        f"test_top1={test_m['top1']:.2f} test_top5={test_m['top5']:.2f}")
 
-    metrics = {"history": history, "test": test_m, "checkpoint": str(best_path)}
-    write_metrics(results_path(config, f"{dataset}_{student_name}_baseline.json"), metrics)
+    metrics = {"history": history, "test": test_m,
+               "checkpoint": str(best_path)}
+    write_metrics(results_path(
+        config, f"{dataset}_{student_name}_baseline.json"), metrics)
     return metrics
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
-    parser.add_argument("--student", choices=["student_s", "student_m", "student_l"], required=True)
+    parser.add_argument(
+        "--student", choices=["student_s", "student_m", "student_l"], required=True)
     args = parser.parse_args()
     run(load_config(args.config), student_name=args.student)
 
