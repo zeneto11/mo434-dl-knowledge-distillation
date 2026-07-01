@@ -4,6 +4,20 @@ All commands are run from the project root with the Poetry environment active (`
 
 ---
 
+## Dataset Statistics
+
+```bash
+python -m src.data.dataset_stats --root data --output-dir results/dataset_stats
+```
+
+Outputs:
+
+- `results/dataset_stats/aircraft.json`
+- `results/dataset_stats/food101.json`
+- `results/reports/dataset_stats.md`
+
+---
+
 ## Quickstart — Launch Everything
 
 ```bash
@@ -95,7 +109,7 @@ Repeat with: `configs/aircraft_convnext_tiny.yaml`, `configs/food101_resnet50.ya
 Checkpoints: `checkpoints/students/{dataset}_{teacher}_{student}_{target}_{loss}.pt`
 Training logs: `results/training_logs/{dataset}_{teacher}_{student}_{target}_{loss}.log`
 
-## Report Generation
+### Training Report Generation
 
 ```bash
 python -m src.training.training_report \
@@ -169,12 +183,36 @@ python -m src.evaluation.evaluate_rkd \
 Add `--skip-costs` to skip GFLOPs/latency computation.
 Eval results: `results/evaluation/{dataset}_{teacher}_{student}_rkd_eval.json`
 
-The RKD results feed the per-dataset **Question 5** section of the main report
-without altering the core 48-model matrix.
+The RKD results feed the per-dataset **Question 5** section of the main report without altering the core 48-model matrix.
 
----
+### Visualize Features
 
-## Report Generation
+Generate qualitative visualizations of teacher vs. distilled-student pre-GAP activation maps on a mix of correct and misclassified test examples.
+
+```bash
+# FGVC-Aircraft
+python -m src.evaluation.visualize_features \
+    --config configs/aircraft_convnext_tiny.yaml \
+    --student student_l --target pregap --loss mse_ce \
+    --output results/figures/report/aircraft_feature_map_comparison.png
+
+# Food-101
+python -m src.evaluation.visualize_features \
+    --config configs/food101_convnext_tiny.yaml \
+    --student student_l --target pregap --loss mse_ce \
+    --output results/figures/report/food101_feature_map_comparison.png
+```
+
+Optional flags:
+
+- `--num-images N` — total examples to display (default: 6)
+- `--num-failures N` — max teacher-correct/student-wrong examples to include (default: 2)
+- `--pool-size N` — random test samples to scan for failures (default: 40)
+- `--seed S` — random seed for reproducibility (default: 7)
+
+Each output shows input image, teacher activation heatmap, and student activation heatmap, with predicted class and representation MSE annotated.
+
+### Report Generation
 
 ```bash
 python -m src.evaluation.report \
@@ -182,20 +220,6 @@ python -m src.evaluation.report \
     --output results/reports/report.md \
     --figures-dir results/figures/report
 ```
-
----
-
-## Dataset Statistics
-
-```bash
-python -m src.data.dataset_stats --root data --output-dir results/dataset_stats
-```
-
-Outputs:
-
-- `results/dataset_stats/aircraft.json`
-- `results/dataset_stats/food101.json`
-- `results/reports/dataset_stats.md`
 
 ---
 

@@ -3,8 +3,34 @@
 This project follows the MO434 assignment **“A Comparative Study of Knowledge Distillation Schemes from Pretrained Image Classifiers into a Lightweight ConvNet.”**  
 The goal is to study how well a lightweight CNN student can imitate representations produced by pretrained image classifiers while reducing parameters and GFLOPs.
 
-The experimental setup is based on representation-based knowledge distillation. Instead of only distilling the teacher logits, the student is trained to predict either the teacher's **pre-GAP feature map** or the teacher's **post-GAP pooled representation**.  
-An additional cross-entropy term can be used to keep the student representation aligned with the dataset labels.
+## Repository Usage
+
+The repository now contains a runnable Python package under `src/`, four YAML configs under `configs/`, and command-line entry points for the three assignment phases.
+
+**Environment Setup**
+
+This project uses **Poetry (v2.2.1)** for dependency management.
+
+```bash
+# Install dependencies and create virtual environment
+poetry install
+
+# Activate the virtual environment
+poetry shell
+```
+
+Experiment execution commands are documented in:  
+[COMMANDS.md](COMMANDS.md)
+
+---
+
+## Deliverable — Best Student per Teacher
+
+[notebooks/best_students.ipynb](notebooks/best_students.ipynb) is the assignment deliverable: a **self-contained**
+notebook that builds and trains the best student **from scratch** for a given
+teacher.  
+It depends only on PyTorch and torchvision, nothing is imported from
+`src/` and no checkpoint or result file is required.
 
 ---
 
@@ -113,6 +139,36 @@ The Student baselines are important because they answer whether distillation imp
 ```text
 Total:
 48 + 6 + 4 = 58 models
+```
+
+The experimental setup is:
+
+```text
+Datasets
+---------
+FGVC-Aircraft
+Food-101
+
+Teachers
+---------
+ResNet50
+ConvNeXt-Tiny
+
+Students
+---------
+Student-S
+Student-M
+Student-L
+
+Predictors (targets)
+---------
+Convolutional predictor (Pre-GAP feature map)
+MLP predictor (Post-GAP pooled vector)
+
+Losses
+---------
+MSE
+MSE + CrossEntropy
 ```
 
 ---
@@ -366,136 +422,5 @@ Metrics:
 | **Number of parameters** | Measures model compactness.      |
 | **GFLOPs**               | Measures computational cost.     |
 | **Inference time**       | Practical efficiency metric.     |
-
----
-
-## 4. Core Questions
-
-The final report should answer the core questions from the MO434 project statement:
-
-### Which teacher transfers best?
-
-Compare ResNet50 and ConvNeXt-Tiny as teachers for both datasets.
-
-### What should the student predict?
-
-Compare:
-
-```text
-pre-GAP feature map
-vs
-post-GAP pooled vector
-```
-
-The pre-GAP target may preserve spatial information better, while the post-GAP target may be easier and cheaper to learn.
-
-### What is the best architectures encoder for the student’s encoder + predictor?
-
-The project compares three custom CNN students:
-
-```text
-Student-S
-Student-M
-Student-L
-```
-
-The predictor depends on the distillation target:
-
-```text
-pre-GAP  → convolutional predictor
-post-GAP → MLP predictor
-```
-
-### What should we use as a loss function?
-
-Compare:
-
-```text
-MSE
-vs
-MSE + CrossEntropy
-```
-
-The expected hypothesis is that MSE + CrossEntropy should produce better classification results because it combines representation matching with label supervision.
-
-### What can you learn and use in this project from the literature of knowledge distillation?
-
-Papers cited in the assignment:
-
-1. **VGG — Simonyan and Zisserman, 2015**  
-   Introduced very deep convolutional networks and serves as a classical CNN reference.
-
-2. **ResNet — He et al., 2016**  
-   Introduced residual learning, making very deep CNNs easier to train. ResNet50 is used here as one of the teachers.
-
-3. **ConvNeXt — Liu et al., 2022**  
-   Modernized CNN design for the 2020s. ConvNeXt-Tiny is used here as the second teacher.
-
-4. **Knowledge Distillation — Hinton, Vinyals, and Dean, 2015**  
-   Proposed transferring knowledge from a teacher to a student using softened logits. This project differs by focusing mainly on representation distillation rather than only logit distillation.
-
-5. **FitNets — Romero et al., 2015**  
-   Introduced training thin students using intermediate hints from the teacher. The pre-GAP feature-map target in this project is closest to the FitNets idea.
-
-6. **Attention Transfer — Zagoruyko and Komodakis, 2017**  
-   Proposed transferring spatial attention maps. This is relevant to the pre-GAP setting, where spatial structure is preserved.
-
-7. **Relational Knowledge Distillation — Park et al., 2019**  
-   Proposed transferring relations among samples rather than only matching individual outputs.
-
----
-
-## 5. Final Experimental Summary
-
-The experimental setup is:
-
-```text
-Datasets
----------
-FGVC-Aircraft
-Food-101
-
-Teachers
----------
-ResNet50
-ConvNeXt-Tiny
-
-Students
----------
-Student-S
-Student-M
-Student-L
-
-Predictors (targets)
----------
-Convolutional predictor (Pre-GAP feature map)
-MLP predictor (Post-GAP pooled vector)
-
-Losses
----------
-MSE
-MSE + CrossEntropy
-```
-
----
-
-## 6. Repository Usage
-
-The repository now contains a runnable Python package under `src/`, four YAML configs under `configs/`, and command-line entry points for the three assignment phases.
-
-**Environment Setup**
-
-This project uses **Poetry (v2.2.1)** for dependency management.
-
-```bash
-# Install dependencies and create virtual environment
-poetry install
-
-# Activate the virtual environment
-poetry shell
-```
-
-Experiment execution commands are documented in:  
-`COMMANDS.md`
 
 ---
